@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Create SQS  
-#  create_test_queues('s3sync-worker', 100)
-./sqs_utils.py   
+./init_env.py   
 
 exit 0
