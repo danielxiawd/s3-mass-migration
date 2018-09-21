@@ -57,7 +57,7 @@ class sqsClass:
 
 
     def recv_test():
-        response = sqs_client.receive_message(
+        response = self.sqs_client.receive_message(
             QueueUrl='https://eu-west-1.queue.amazonaws.com/888250974927/s3-copy-list-18',
             MaxNumberOfMessages=10
         )
@@ -134,7 +134,33 @@ class sqsClass:
 
     def delete_test_queues(self, queue_name=None, queue_num=None):
         pass
-        
+
+
+    def check_queue_status(self, qurl):
+        #print('check_queue_status(%s)'%(qurl))
+        #return {'number':0}
+
+        response = self.sqs_client.get_queue_attributes(
+            QueueUrl=qurl,
+            AttributeNames=[
+                'All'
+            ]
+        )
+
+        #pprint(response)
+        #{u'Attributes': {'ApproximateNumberOfMessages': '1',
+
+        message_number=0
+        if 'Attributes' in response:
+            if 'ApproximateNumberOfMessages' in response['Attributes'] and 'ApproximateNumberOfMessagesNotVisible' in response['Attributes']:
+                message_number=int(response['Attributes']['ApproximateNumberOfMessages'])
+                not_visiable_message_number=int(response['Attributes']['ApproximateNumberOfMessagesNotVisible'])
+                if message_number>0 or not_visiable_message_number>0:
+                    #print('%04d/%04d : %s'%(message_number, not_visiable_message_number, qurl))
+                    pass
+                    
+        return {'number':message_number}
+            
 
 if __name__ == '__main__':
     sqs_profile = sqsClass(profile_name='dst_profile')

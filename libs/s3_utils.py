@@ -6,8 +6,7 @@ import gzip
 import json
 import os
 
-print("boto3.version [{}]".format(boto3.__version__))
-
+#print("boto3.version [{}]".format(boto3.__version__))
 from utils import *
 
 
@@ -83,9 +82,9 @@ class s3Class:
 
         return True
 
-    def save_json_to_s3_object(json_data, dst_bucket, dst_key):
+    def save_json_to_s3_object(self, json_data, dst_bucket, dst_key):
         # with open('filename', 'rb') as data:
-        object = s3.Object(dst_bucket, dst_key)
+        object = self.s3_conn.Object(dst_bucket, dst_key)
         #print(json.dumps(json_data))
         object.put(Body=json.dumps(json_data))
         #s3_client.upload_fileobj(json.dumps(json_data), dst_bucket, dst_key)
@@ -151,14 +150,20 @@ class s3Class:
         return filename
 
 def test():
-    s3_inventory = s3Class(profile_name='default')
+    s3_inventory = s3Class()
     print(s3_inventory.profile_name)
 
     #filename = s3_inventory.s3_download('leo-bjs-inventory-bucket', 'leodatacenter/leodatacenter/2017-12-25T08-00Z/manifest.json')
     #print(filename)
 
-    data = s3_inventory.load_json_from_s3_object('leo-bjs-inventory-bucket', 'leodatacenter/leodatacenter/2017-12-25T08-00Z/manifest.json')
-    print(data)
+    #data = s3_inventory.load_json_from_s3_object('leo-bjs-inventory-bucket', 'leodatacenter/leodatacenter/2017-12-25T08-00Z/manifest.json')
+    #print(data)
+
+    src_bucket='reinvent'
+    dst_bucket='leo-zhy-reinvent'
+    key='index.html'
+
+    s3_inventory.s3_copy(src_bucket, dst_bucket, key)
 
     pass
 

@@ -129,7 +129,6 @@ def main():
     dst_profile = s3Class(profile_name=job_info['dst_profile'])
     sqs_profile = sqsClass(profile_name=job_info['dst_profile'])
 
-
     # 1. Get Source information
     manifest = downlad_bucket_manifest(src_profile, job_info['inventory_bucket'], job_info['inventory_manifest_dir']+'manifest.json')
 
