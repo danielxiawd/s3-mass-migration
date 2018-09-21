@@ -2,25 +2,13 @@
 # -*- coding: utf8 -*-
 
 from pprint import pprint
+from utils import *
 from s3_utils import *
 from sqs_utils import *
 from urllib import unquote_plus
 import random
 
 # 0. Job
-job_info = {
-    'src_profile': 'src_profile',
-    'dst_profile': 'dst_profile',
-    'src_type': 's3_inventory',
-    'inventory_bucket': 'chinakb-inventory-beijing',
-    'inventory_manifest_dir': 'reinvent/chinakb-inventory-beijnig/2018-09-16T08-00Z/',
-    'queue_url_prefix': 'https://sqs.cn-northwest-1.amazonaws.com.cn/358620020600/s3sync-worker',
-    'queue_num': 10, # How many SQS to use
-    'message_body_max_num': 100, # How many objects in one message body
-    'src_bucket': 'reinvent',
-    'dst_bucket': 'leo-zhy-reinvent'
-}
-
 object_key_list= ['totalObjects', 'totalObjectsSub1GB', 'totalObjectsSub5GB', 'totalObjectsSub10GB', 'totalObjectsSub50GB', 'totalObjectsSub100GB', 'totalObjectsSub1TB', 'totalObjectsSub5TB']
 # Inventory process
 
@@ -28,7 +16,7 @@ object_key_list= ['totalObjects', 'totalObjectsSub1GB', 'totalObjectsSub5GB', 't
 def format_key(key):
     return unquote_plus(key) 
     
-def parse_inventory_data_file(data_file, job_info=None, profile_name='default'):
+def parse_inventory_data_file(session, data_file, job_info=None, profile_name='default'):
     msg_body=[]
 
     stat={}
@@ -112,33 +100,38 @@ def parse_inventory_data_file(data_file, job_info=None, profile_name='default'):
 
             if len(msg_body) == job_info['message_body_max_num']:
                 qurl='%s-%03d'%(job_info['queue_url_prefix'], random.randint(1, job_info['queue_num']))
-                send_msg_to_sqs(qurl, msg_body, profile_name=profile_name)
+                session.send_msg_to_sqs(qurl, msg_body)
                 msg_body=[]
 
     if len(msg_body) > 0:
         qurl='%s-%03d'%(job_info['queue_url_prefix'], random.randint(1, job_info['queue_num']))
-        send_msg_to_sqs(qurl, msg_body)
+        session.send_msg_to_sqs(qurl, msg_body)
 
     pprint(stat)
 
     return stat 
 
-def downlad_bucket_manifest(session):
+def downlad_bucket_manifest(session, dst_bucket, dst_obj):
     ''' test FIXME '''
     # leo-bjs-inventory-bucket', 'leodatacenter/leodatacenter/2017-12-25T08-00Z/
-    data = session.load_json_from_s3_object(job_info['inventory_bucket'], job_info['inventory_manifest_dir']+'manifest.json')
+    data = session.load_json_from_s3_object(dst_bucket, dst_obj)
     pprint(data)
     return data
 
 def main():
     # 0. Initial
+    # load job_info
+    job_info = load_json_from_file('./job.json')
+
+    pprint(job_info)
+
     src_profile = s3Class(profile_name=job_info['src_profile'])
     dst_profile = s3Class(profile_name=job_info['dst_profile'])
+    sqs_profile = sqsClass(profile_name=job_info['dst_profile'])
+
 
     # 1. Get Source information
-    manifest = downlad_bucket_manifest(src_profile)
-
-
+    manifest = downlad_bucket_manifest(src_profile, job_info['inventory_bucket'], job_info['inventory_manifest_dir']+'manifest.json')
 
     manifest['statistics'] = {}
     for key in object_key_list:
@@ -150,7 +143,7 @@ def main():
             pprint(item)
             download_filename = src_profile.download_s3_object_from_inventory(job_info['inventory_bucket'], item)
 
-            stat = parse_inventory_data_file(download_filename, job_info)
+            stat = parse_inventory_data_file(sqs_profile, download_filename, job_info)
             #print(stat)
 
             for key in object_key_list:
@@ -160,17 +153,17 @@ def main():
     manifest['job_info'] = job_info
 
     pprint(manifest)
-    sys.exit()
 
     #save back manifest 
-    #save_json_to_s3_object(manifest, job_info['inventory_bucket'], job_info['inventory_manifest_dir']+'job.json')
 
-    #data = load_json_from_s3_object(job_info['inventory_bucket'], job_info['inventory_manifest_dir']+'job.json')
+    dst_profile.save_json_to_s3_object(manifest, job_info['job_bucket'], '{}/job_stat.json'.format(job_info['job_dir']))
 
-    pprint(data)
+    #data = dst_profile.load_json_from_s3_object(job_info['job_bucket'], '{}/job.json'.format(job_info['job_dir']))
+    #pprint(data)
 
-    #print("=== Job description is at s3://{}/{}".format(job_info['inventory_bucket'], job_info['inventory_manifest_dir']+'job.json'))
+    print("=== Job description is at s3://{}/{}".format(job_info['job_bucket'], '{}/job_stat.json'.format(job_info['job_dir'])))
 
+    sys.exit()
 
 if __name__ == '__main__':
     main()

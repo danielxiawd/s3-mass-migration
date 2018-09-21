@@ -1,0 +1,14 @@
+{
+    "src_profile": "src_profile",
+    "dst_profile": "dst_profile",
+    "src_type": "s3_inventory",
+    "inventory_bucket": "chinakb-inventory-beijing",
+    "inventory_manifest_dir": "reinvent/chinakb-inventory-beijnig/2018-09-16T08-00Z/",
+    "queue_url_prefix": "https://sqs.cn-northwest-1.amazonaws.com.cn/358620020600/s3sync-worker",
+    "queue_num": 10,
+    "message_body_max_num": 100,
+    "src_bucket": "reinvent",
+    "dst_bucket": "leo-zhy-reinvent",
+    "job_bucket": "leo-zhy-tasks",
+    "job_dir": "test-migration"
+}
