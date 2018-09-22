@@ -9,7 +9,7 @@ from urllib import unquote_plus
 import random
 
 # 0. Job
-object_key_list= ['totalObjects', 'totalObjectsSub1GB', 'totalObjectsSub5GB', 'totalObjectsSub10GB', 'totalObjectsSub50GB', 'totalObjectsSub100GB', 'totalObjectsSub1TB', 'totalObjectsSub5TB']
+object_key_list= ['totalSize', 'totalObjects', 'totalObjectsSub1GB', 'totalObjectsSub5GB', 'totalObjectsSub10GB', 'totalObjectsSub50GB', 'totalObjectsSub100GB', 'totalObjectsSub1TB', 'totalObjectsSub5TB']
 # Inventory process
 
 
@@ -48,6 +48,7 @@ def parse_inventory_data_file(session, data_file, job_info=None, profile_name='d
             }
 
             # Do Stat
+            stat['totalSize'] += size
             stat['totalObjects'] += 1
 
             if size > 5*1000*1000*1000:

@@ -15,7 +15,7 @@ while [ 1 ]; do
 
     echo "`date`: $N" >> $LOG
 
-    sleep 3600
+    sleep 1800
 done
 
 popd
