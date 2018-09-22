@@ -13,7 +13,7 @@ while [ 1 ]; do
 
     N=`python check_sqs_list.py`
 
-    echo "`date`: $N" >> check_sqs.log
+    echo "`date`: $N" >> $LOG
 
     sleep 3600
 done
