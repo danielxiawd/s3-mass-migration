@@ -1,8 +1,13 @@
 # S3 Mass Migration
-S3迁移框架 *更新时间: 2018/09/24*
+S3迁移框架 *更新时间: 2018/10/11*
 - AWS中国区域大规模S3数据迁移工具
 
-## 说明
+## 免责说明
+建议测试过程中使用此方案，生产环境使用请自行考虑评估。<br>
+当您对方案需要进一步的沟通和反馈后，可以联系 nwcd_labs@nwcdcloud.cn 获得更进一步的支持。<br>
+欢迎联系参与方案共建和提交方案需求, 也欢迎在 github 项目issue中留言反馈bugs。
+
+## 项目说明
 完成海量数据通过公网方式迁入AWS的S3, 提供高效可扩展的复制架构, 完整的复制过程监控和数据复制有效性确认。
 ### 计划支持数据源
 - [X] AWS中国区域
@@ -61,20 +66,28 @@ S3迁移框架 *更新时间: 2018/09/24*
   - 定义复制任务job.json
     ```Bash
     # 例子
-    {
-        "src_profile": "src_profile",
-        "dst_profile": "dst_profile",
-        "src_type": "s3_inventory",
-        "inventory_bucket": "chinakb-inventory-beijing",
-    "inventory_manifest_dir": "reinvent/chinakb-inventory-beijnig/2018-09-16T08-00Z/",
-        "queue_url_prefix": "https://sqs.cn-northwest-1.amazonaws.com.cn/358620020600/s3sync-worker",
-    "queue_num": 10,
-        "message_body_max_num": 100,
-    "src_bucket": "reinvent",
-        "dst_bucket": "leo-zhy-reinvent",
-        "job_bucket": "leo-zhy-tasks",
-        "job_dir": "test-migration"
-    }
+	{
+		"src": {
+			"profile": "src_profile",
+			"type": "s3_inventory",
+			"bucket": "reinvent",
+			"inventory_bucket": "chinakb-inventory-beijing",
+			"inventory_manifest_dir": "reinvent/chinakb-inventory-beijnig/2018-09-16T08-00Z/"
+		},
+		"dst": {
+			"profile": "dst_profile",
+			"bucket": "leo-zhy-reinvent",
+			"inventory_bucket": "leo-zhy-inventory-bucket",
+			"inventory_manifest_dir": "reinvent/chinakb-inventory-beijnig/2018-09-16T08-00Z/"
+		},
+		"queue" : {
+			"url_prefix": "https://sqs.cn-northwest-1.amazonaws.com.cn/xxx62002xxxx/s3sync-worker",
+			"num": 10,
+			"message_body_max_num": 100
+		},
+		"job_bucket": "leo-zhy-tasks",
+		"job_dir": "test-migration"
+	}
     ```
   - 生成任务清单
   ```Bash

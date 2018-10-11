@@ -15,15 +15,15 @@ import boto3
 if __name__ == '__main__':
     # 0. Initial
     # load job_info
-    job_info = load_json_from_file('./job.json')
+    job_info = load_json_from_file('../job.json')
 
     # Init env
-    sqs_profile = sqsClass(job_info['dst_profile'])
+    sqs_profile = sqsClass(job_info['dst']['profile'])
 
     #
     total_number=0
-    for pos in xrange(job_info['queue_num']):
-        response = sqs_profile.check_queue_status('%s-%03d'%(job_info['queue_url_prefix'], pos+1))
+    for pos in xrange(job_info['queue']['num']):
+        response = sqs_profile.check_queue_status('%s-%03d'%(job_info['queue']['url_prefix'], pos+1))
 
         total_number+=response['number']
         

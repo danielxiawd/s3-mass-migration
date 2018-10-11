@@ -132,9 +132,9 @@ def TaskExecutor(job_position=None):
     pprint(job_info)
 
     # Start Copy Job
-    qurl_endpoint=job_info['queue_url_prefix']
+    qurl_endpoint=job_info['queue']['url_prefix']
     dead_queue='{}-dead-letter'.format(qurl_endpoint)
-    q_number=job_info['queue_num']
+    q_number=job_info['queue']['num']
 
     #response=check_queue('{0}-{1}'.format(qurl_endpoint, q_number), dead_queue)
     #pprint(response)
