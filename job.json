@@ -1,20 +1,20 @@
 {
 	"src": {
-		"src_profile": "src_profile",
-		"src_type": "s3_inventory",
-		"src_bucket": "reinvent",
+		"profile": "src_profile",
+		"type": "s3_inventory",
+		"bucket": "reinvent",
 		"inventory_bucket": "chinakb-inventory-beijing",
 		"inventory_manifest_dir": "reinvent/chinakb-inventory-beijnig/2018-09-16T08-00Z/"
 	},
 	"dst": {
-		"dst_profile": "dst_profile",
-		"dst_bucket": "leo-zhy-reinvent",
+		"profile": "dst_profile",
+		"bucket": "leo-zhy-reinvent",
 		"inventory_bucket": "leo-zhy-inventory-bucket",
 		"inventory_manifest_dir": "reinvent/chinakb-inventory-beijnig/2018-09-16T08-00Z/"
 	},
 	"queue" : {
-		"queue_url_prefix": "https://sqs.cn-northwest-1.amazonaws.com.cn/358620020600/s3sync-worker",
-		"queue_num": 10,
+		"url_prefix": "https://sqs.cn-northwest-1.amazonaws.com.cn/358620020600/s3sync-worker",
+		"num": 10,
 		"message_body_max_num": 100
 	},
     "job_bucket": "leo-zhy-tasks",
