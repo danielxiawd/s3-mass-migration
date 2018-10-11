@@ -9,7 +9,7 @@ from urllib import unquote_plus
 import random
 
 # 0. Job
-object_key_list= ['totalSize', 'totalObjects', 'totalObjectsSub1GB', 'totalObjectsSub5GB', 'totalObjectsSub10GB', 'totalObjectsSub50GB', 'totalObjectsSub100GB', 'totalObjectsSub1TB', 'totalObjectsSub5TB']
+object_key_list= ['totalSizeInBytes', 'totalObjects', 'totalObjectsSub1GB', 'totalObjectsSub5GB', 'totalObjectsSub10GB', 'totalObjectsSub50GB', 'totalObjectsSub100GB', 'totalObjectsSub1TB', 'totalObjectsSub5TB']
 # Inventory process
 
 
@@ -44,11 +44,11 @@ def parse_inventory_data_file(session, data_file, job_info=None, profile_name='d
                 'StorageClass': sections[5].split('"')[1],
                 'IsMultipartUploaded': sections[6].split('"')[1],
                 'ReplicationStatus': sections[7].split('"')[1],
-                'dst_bucket':job_info['dst_bucket']
+                'dst_bucket':job_info['dst']['bucket']
             }
 
             # Do Stat
-            stat['totalSize'] += size
+            stat['totalSizeInBytes'] += size
             stat['totalObjects'] += 1
 
             if size > 5*1000*1000*1000:
@@ -99,13 +99,13 @@ def parse_inventory_data_file(session, data_file, job_info=None, profile_name='d
             #msg_body.append({'src_bucket':src_bucket, 'key':key, 'dst_bucket':job_info['dst_bucket']})
             msg_body.append(item)
 
-            if len(msg_body) == job_info['message_body_max_num']:
-                qurl='%s-%03d'%(job_info['queue_url_prefix'], random.randint(1, job_info['queue_num']))
+            if len(msg_body) == job_info['queue']['message_body_max_num']:
+                qurl='%s-%03d'%(job_info['queue']['url_prefix'], random.randint(1, job_info['queue']['num']))
                 session.send_msg_to_sqs(qurl, msg_body)
                 msg_body=[]
 
     if len(msg_body) > 0:
-        qurl='%s-%03d'%(job_info['queue_url_prefix'], random.randint(1, job_info['queue_num']))
+        qurl='%s-%03d'%(job_info['queue']['url_prefix'], random.randint(1, job_info['queue']['num']))
         session.send_msg_to_sqs(qurl, msg_body)
 
     pprint(stat)
@@ -122,16 +122,17 @@ def downlad_bucket_manifest(session, dst_bucket, dst_obj):
 def main():
     # 0. Initial
     # load job_info
-    job_info = load_json_from_file('./job.json')
+    ## TODO: Will load job.json based on para
+    job_info = load_json_from_file('../job.json')
 
     pprint(job_info)
 
-    src_profile = s3Class(profile_name=job_info['src_profile'])
-    dst_profile = s3Class(profile_name=job_info['dst_profile'])
-    sqs_profile = sqsClass(profile_name=job_info['dst_profile'])
+    src_profile = s3Class(profile_name=job_info['src']['profile'])
+    dst_profile = s3Class(profile_name=job_info['dst']['profile'])
+    sqs_profile = sqsClass(profile_name=job_info['dst']['profile'])
 
     # 1. Get Source information
-    manifest = downlad_bucket_manifest(src_profile, job_info['inventory_bucket'], job_info['inventory_manifest_dir']+'manifest.json')
+    manifest = downlad_bucket_manifest(src_profile, job_info['src']['inventory_bucket'], job_info['src']['inventory_manifest_dir']+'manifest.json')
 
     manifest['statistics'] = {}
     for key in object_key_list:
@@ -141,7 +142,7 @@ def main():
     if 'files' in manifest:
         for item in manifest['files']:
             pprint(item)
-            download_filename = src_profile.download_s3_object_from_inventory(job_info['inventory_bucket'], item)
+            download_filename = src_profile.download_s3_object_from_inventory(job_info['src']['inventory_bucket'], item)
 
             stat = parse_inventory_data_file(sqs_profile, download_filename, job_info)
             #print(stat)
