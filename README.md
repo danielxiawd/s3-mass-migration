@@ -55,7 +55,7 @@ S3迁移框架 *更新时间: 2018/10/11*
  
     AWS Region   | YAML Format 
     ------------ | ------------
-    宁夏区域 | [![launch-yaml](images/cloudformation-launch-stack-button.png)](https://console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/new?stackName=EasyVPNServer&amp;templateURL=https://s3.cn-northwest-1.amazonaws.com.cn/nwcdlabs/templates/easy-vpc-peering/EasyVPN_Server.yaml)
+    宁夏区域 | TODO
  2. 创建任务列表
   - 登陆任务节点
   - 创建任务SQS队列组
