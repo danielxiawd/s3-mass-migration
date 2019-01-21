@@ -135,7 +135,7 @@ S3迁移框架 *更新时间: 2018/10/11*
  
     AWS Region   | YAML Format 
     ------------ | ------------
-    北京区域 | [![launch-yaml](images/cloudformation-launch-stack-button.png)](https://console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/new?stackName=EasyVPNClient&amp;templateURL=https://s3.cn-northwest-1.amazonaws.com.cn/nwcdlabs/templates/easy-vpc-peering/EasyVPN_Client.yaml)
+    北京区域 | TODO
  4. 监控复制进程
     ```Bash
     # tail -f /root/s3-mass-migration/logs/check_sqs.log
